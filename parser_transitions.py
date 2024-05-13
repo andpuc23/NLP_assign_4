@@ -54,21 +54,22 @@ class PartialParse(object):
         ###         3. Right Arc
 
         if transition == "S":
-            self.stack.append(self.buffer.pop(0))
-        elif transition == "LA":
-            head = self.stack[-1]
-            dependent = self.stack[-2]
-            self.dependencies.append((head, dependent))
-            self.stack.pop(-2)
-        elif transition == "RA":
-            head = self.stack[-2]
-            dependent = self.stack[-1]
-            self.dependencies.append((head, dependent))
-            self.stack.pop()
+            if self.buffer:
+                self.stack.append(self.buffer.pop(0))
         else:
-            raise ValueError(f'transition {transition} is unknown, options: "S", "LA", "RA"')
-
-
+            first = self.stack.pop()
+            try:
+                second = self.stack.pop()
+                if transition == "LA":
+                    self.dependencies.append((first, second))
+                    self.stack.append(first)
+                else:  # RA
+                    self.dependencies.append((second, first))
+                    self.stack.append(second)
+            except: 
+                print('invalid transition encountered')
+                self.dependencies.append((first, first))
+                self.stack.append(first)
         ### END YOUR CODE
 
     def parse(self, transitions):
@@ -130,9 +131,9 @@ def minibatch_parse(sentences, model, batch_size):
         for pparse, t in zip(batch, transitions):
             pparse.parse_step(t)
 
-        for pparse in unfinished_parses:
+        for i, pparse in enumerate(unfinished_parses):
             if not pparse.buffer and len(pparse.stack) == 1:
-                unfinished_parses.remove(pparse)
+                unfinished_parses.pop(i)
 
     dependencies = [pparse.dependencies for pparse in partial_parses]
     return dependencies

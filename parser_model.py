@@ -147,14 +147,9 @@ class ParserModel(nn.Module):
         ### Please see the following docs for support:
         ###     Matrix product: https://pytorch.org/docs/stable/torch.html#torch.matmul
         ###     ReLU: https://pytorch.org/docs/stable/nn.html?highlight=relu#torch.nn.functional.relu
-        e = self.embedding_lookup(w)
-        w1 = e @ self.embed_to_hidden_weight
-        a1 = w1 + self.embed_to_hidden_bias
-        h = F.relu(a1)
-        h = self.dropout(h)
-        w2 = h @ self.hidden_to_logits_weight 
-        logits = w2 + self.hidden_to_logits_bias
-
+        a1 = self.embedding_lookup(w) @ self.embed_to_hidden_weight + self.embed_to_hidden_bias
+        
+        logits = self.dropout(F.relu(a1)) @ self.hidden_to_logits_weight + self.hidden_to_logits_bias
         ### END YOUR CODE
         return logits
 
