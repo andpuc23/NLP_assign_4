@@ -67,7 +67,7 @@ class PartialParse(object):
                     self.dependencies.append((second, first))
                     self.stack.append(second)
             except: 
-                print('invalid transition encountered')
+                # print('invalid transition encountered')
                 self.dependencies.append((first, first))
                 self.stack.append(first)
         ### END YOUR CODE
