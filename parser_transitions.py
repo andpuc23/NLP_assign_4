@@ -57,19 +57,16 @@ class PartialParse(object):
             if self.buffer:
                 self.stack.append(self.buffer.pop(0))
         else:
+            if len(self.stack) < 2:
+                return
             first = self.stack.pop()
-            try:
-                second = self.stack.pop()
-                if transition == "LA":
-                    self.dependencies.append((first, second))
-                    self.stack.append(first)
-                else:  # RA
-                    self.dependencies.append((second, first))
-                    self.stack.append(second)
-            except: 
-                # print('invalid transition encountered')
-                self.dependencies.append((first, first))
+            second = self.stack.pop()
+            if transition == "LA":
+                self.dependencies.append((first, second))
                 self.stack.append(first)
+            else:  # RA
+                self.dependencies.append((second, first))
+                self.stack.append(second)
         ### END YOUR CODE
 
     def parse(self, transitions):
